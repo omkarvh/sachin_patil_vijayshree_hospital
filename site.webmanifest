@@ -1,0 +1,13 @@
+{
+  "name": "Vijayshree Healthcare, Bidar",
+  "short_name": "Vijayshree",
+  "description": "Consultant physician and diabetes care in Bidar by Dr. Sachin Patil.",
+  "icons": [
+    { "src": "assets/favicon/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/favicon/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#04080F",
+  "background_color": "#04080F",
+  "display": "standalone",
+  "start_url": "index.html"
+}
