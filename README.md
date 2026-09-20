@@ -180,3 +180,67 @@ js/icons.js         ← inline SVG icon set
 js/main.js          ← navbar, footer, WhatsApp float, scroll animations
 js/home.js  js/about.js  js/blogs.js  js/contact.js
 ```
+
+---
+
+# Admin Panel (Site Manager)
+
+Open **`admin/`** in a browser (e.g. `yoursite.com/admin/`). Everything on the
+website — text, photos, articles, certificates, phone numbers — is edited there.
+`content.js` stays as the built-in defaults and the safety net: if the database is
+unreachable, the site falls back to it and still works.
+
+## Right now it runs in PREVIEW MODE
+
+Firebase isn't connected yet, so the admin panel saves into your own browser only.
+Nothing is shared and nothing is published. This lets the whole panel be used and
+tested today. An amber banner at the top reminds you.
+
+## Connecting Firebase (when the account is ready)
+
+1. Create a project at <https://console.firebase.google.com> (free Spark plan).
+2. **Build → Firestore Database → Create database** (production mode).
+3. **Build → Authentication → Sign-in method → Email/Password → Enable**, then
+   **Users → Add user** with the clinic's email and a password.
+4. **Project settings → General → Your apps → Web app** — copy the config values
+   into `js/firebase-config.js`.
+5. **Firestore → Rules** — paste in the contents of `firestore.rules` and Publish.
+
+That's it. The site switches over automatically: the banner disappears and the
+admin asks for a login. Set `ADMIN_EMAIL` in `js/firebase-config.js` to lock
+sign-in to one address.
+
+## Why pictures are never uploaded to Firebase Storage
+
+Firebase Storage needs the paid Blaze plan. Firestore (the database) is free up to
+1 GB, so **every picture is stored inside the database instead**, as a compressed
+data-URL in its own record.
+
+To make that work, each picture is shrunk **in the browser before it is saved**:
+resized, converted to WebP and re-compressed until it fits the budget for its slot
+(certificates get the most detail at ~260 KB, thumbnails the least at ~140 KB). A
+4 MB phone photo typically lands around 150-250 KB. The admin shows the before/after
+size on every upload.
+
+Two limits worth knowing:
+
+- **One record can hold 1 MB.** The panel refuses anything larger and says so.
+- **All the text together is also one record.** The "Pictures" screen shows total
+  usage so you can see how much of the free 1 GB is gone (realistically: never much).
+
+Visitors never download the Firebase SDK — the public pages read the content over a
+plain web request, so the site stays fast. Only `admin/` loads the SDK.
+
+## Certificates
+
+**About & Certificates → Certificates & recognition.** Add an entry, type the name
+and issuer, and upload the scan. Visitors see a gallery; clicking a certificate opens
+it full size. An entry with no scan uploaded still shows as a tidy card with its
+title, so the section never looks broken while scans are being collected.
+
+## Day-to-day
+
+- **Save & publish** (or Ctrl+S) puts changes live. A green dot marks unsaved work.
+- **Discard changes** throws away unsaved edits and reloads what's published.
+- Lists (articles, certificates, FAQs, hours) can be reordered with the arrows and
+  removed with the bin. Deleting asks first.

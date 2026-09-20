@@ -1226,3 +1226,101 @@ body.light-nav .navbar.scrolled .nav-toggle{ color:var(--ink-900); }
 @media (prefers-reduced-motion:reduce){
   *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
 }
+
+/* ==========================================================
+   CERTIFICATES — About page gallery + full-size viewer
+   ========================================================== */
+.cert-grid{
+  display:grid; gap:26px;
+  grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+}
+.cert-card{
+  background:var(--paper-0); border:1px solid var(--ink-200); border-radius:var(--radius-md);
+  overflow:hidden; box-shadow:var(--shadow-sm);
+  transition:transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s, border-color .3s;
+  margin:0; display:flex; flex-direction:column;
+}
+.cert-card.has-img{ cursor:zoom-in; }
+.cert-card.has-img:hover,
+.cert-card.has-img:focus-visible{
+  transform:translateY(-6px); box-shadow:var(--shadow-md); border-color:var(--mint-400);
+  outline:none;
+}
+.cert-card.has-img:focus-visible{ box-shadow:0 0 0 3px rgba(0,229,160,.35), var(--shadow-md); }
+
+.cert-thumb{
+  position:relative; aspect-ratio:4/3; background:var(--paper-50);
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.cert-thumb img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .6s cubic-bezier(.16,1,.3,1);
+}
+.cert-card.has-img:hover .cert-thumb img{ transform:scale(1.06); }
+
+.cert-zoom{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  background:rgba(4,8,15,.42); opacity:0; transition:opacity .3s;
+}
+.cert-zoom svg{ width:26px; height:26px; color:#fff; }
+.cert-card.has-img:hover .cert-zoom,
+.cert-card.has-img:focus-visible .cert-zoom{ opacity:1; }
+
+/* Card for a certificate whose scan hasn't been uploaded yet */
+.cert-placeholder{
+  display:flex; align-items:center; justify-content:center;
+  width:64px; height:64px; border-radius:var(--radius-full);
+  background:var(--paper-100); border:1px dashed var(--ink-200);
+}
+.cert-placeholder svg{ width:28px; height:28px; color:var(--mint-500); }
+
+.cert-card figcaption{ padding:18px 20px 20px; }
+.cert-title{
+  font-family:'Sora',sans-serif; font-weight:700; font-size:15.5px;
+  color:var(--ink-900); letter-spacing:-.02em; line-height:1.3;
+}
+.cert-issuer{ font-size:13px; color:var(--ink-600); margin-top:5px; line-height:1.45; }
+.cert-year{
+  display:inline-block; margin-top:10px; padding:4px 11px; border-radius:var(--radius-full);
+  background:var(--paper-100); color:var(--ink-600); font-size:11.5px; font-weight:600;
+}
+
+/* --- Full-size viewer --- */
+.cert-lightbox{
+  position:fixed; inset:0; z-index:4000; display:none;
+  align-items:center; justify-content:center; padding:5vh 5vw;
+  background:rgba(4,8,15,.92); backdrop-filter:blur(10px);
+}
+.cert-lightbox.active{ display:flex; animation:certFade .28s ease both; }
+@keyframes certFade{ from{ opacity:0 } to{ opacity:1 } }
+
+.cert-lb-inner{
+  margin:0; max-width:min(1000px, 92vw); max-height:90vh;
+  display:flex; flex-direction:column; align-items:center; gap:16px;
+}
+.cert-lb-inner img{
+  max-width:100%; max-height:76vh; object-fit:contain;
+  border-radius:var(--radius-sm); box-shadow:var(--shadow-lg); background:#fff;
+}
+.cert-lb-inner figcaption{
+  color:rgba(255,255,255,.82); font-size:14.5px; text-align:center; line-height:1.5;
+}
+.cert-lb-inner figcaption strong{ color:#fff; font-family:'Sora',sans-serif; }
+
+.cert-lb-close{
+  position:absolute; top:22px; right:24px; width:46px; height:46px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:var(--radius-full); cursor:pointer;
+  background:rgba(255,255,255,.10); border:1px solid var(--glass-line);
+  backdrop-filter:blur(12px); transition:background .25s, transform .25s;
+}
+.cert-lb-close:hover{ background:rgba(255,255,255,.2); transform:rotate(90deg); }
+.cert-lb-close svg{ width:22px; height:22px; color:#fff; }
+
+@media (max-width:640px){
+  .cert-grid{ grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:16px; }
+  .cert-card figcaption{ padding:14px 14px 16px; }
+  .cert-title{ font-size:14px; }
+  .cert-issuer{ font-size:12px; }
+  .cert-lb-close{ top:14px; right:14px; width:40px; height:40px; }
+}

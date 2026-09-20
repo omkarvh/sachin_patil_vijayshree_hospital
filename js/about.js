@@ -48,6 +48,86 @@ function renderPage(){
     </div>
   `;
 
+  /* ----- CERTIFICATES (hides itself when the list is empty) ----- */
+  const certRoot = document.getElementById('certificatesRoot');
+  const CERT = A.certificates;
+  if(certRoot){
+    const items = (CERT && CERT.items) ? CERT.items.filter(c => c && c.title) : [];
+    if(!items.length){
+      certRoot.style.display = 'none';
+    } else {
+      certRoot.innerHTML = `
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="eyebrow-pill">${CERT.eyebrow}</span>
+            <h2>${CERT.title}</h2>
+            <p>${CERT.subtitle}</p>
+          </div>
+          <div class="cert-grid stagger">
+            ${items.map((c, i) => `
+              <figure class="cert-card reveal ${c.image ? 'has-img' : 'no-img'}"
+                      ${c.image ? `data-cert="${i}" tabindex="0" role="button"
+                       aria-label="View certificate: ${c.title}"` : ''}>
+                <div class="cert-thumb">
+                  ${c.image
+                    ? `<img src="${c.image}" alt="${c.title}" loading="lazy">
+                       <span class="cert-zoom">${icon('maximize')}</span>`
+                    : `<span class="cert-placeholder">${icon('award')}</span>`}
+                </div>
+                <figcaption>
+                  <div class="cert-title">${c.title}</div>
+                  ${c.issuer ? `<div class="cert-issuer">${c.issuer}</div>` : ''}
+                  ${c.year ? `<span class="cert-year">${c.year}</span>` : ''}
+                </figcaption>
+              </figure>`).join('')}
+          </div>
+        </div>
+      `;
+
+      /* Full-size viewer */
+      const open = (i) => {
+        const c = items[i];
+        if(!c || !c.image) return;
+        let lb = document.getElementById('certLightbox');
+        if(!lb){
+          lb = document.createElement('div');
+          lb.id = 'certLightbox';
+          lb.className = 'cert-lightbox';
+          lb.innerHTML = `
+            <button class="cert-lb-close" aria-label="Close">${icon('x')}</button>
+            <figure class="cert-lb-inner">
+              <img alt="">
+              <figcaption></figcaption>
+            </figure>`;
+          document.body.appendChild(lb);
+          const close = () => {
+            lb.classList.remove('active');
+            document.body.style.overflow = '';
+          };
+          lb.querySelector('.cert-lb-close').addEventListener('click', close);
+          lb.addEventListener('click', e => { if(e.target === lb) close(); });
+          document.addEventListener('keydown', e => {
+            if(e.key === 'Escape' && lb.classList.contains('active')) close();
+          });
+        }
+        const img = lb.querySelector('img');
+        img.src = c.image;
+        img.alt = c.title;
+        lb.querySelector('figcaption').innerHTML =
+          `<strong>${c.title}</strong>${c.issuer ? ` — ${c.issuer}` : ''}${c.year ? ` (${c.year})` : ''}`;
+        lb.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      };
+
+      certRoot.querySelectorAll('[data-cert]').forEach(el => {
+        el.addEventListener('click', () => open(parseInt(el.dataset.cert, 10)));
+        el.addEventListener('keydown', e => {
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(parseInt(el.dataset.cert, 10)); }
+        });
+      });
+    }
+  }
+
   document.getElementById('specRoot').innerHTML = `
     <div class="container">
       <div class="section-head reveal">

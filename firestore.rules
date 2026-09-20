@@ -1,0 +1,42 @@
+rules_version = '2';
+
+/* ============================================================
+   Firestore rules for the Vijayshree Healthcare website.
+
+   Paste these into:
+     Firebase console → Firestore Database → Rules → Publish
+
+   The website is public, so anyone may READ the content and the
+   pictures. Only a signed-in admin account may CHANGE anything.
+   ============================================================ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* The single document holding all website text. */
+    match /site/{docId} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    /* One document per picture (data-URL inside the document —
+       Firebase Storage is never used, so nothing is billed). */
+    match /media/{mediaId} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    /* Nothing else is reachable. */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    /* Any signed-in account may edit. To restrict it to one person,
+       replace the line below with:
+         return request.auth != null
+                && request.auth.token.email == 'clinic@example.com';   */
+    function isAdmin(){
+      return request.auth != null;
+    }
+  }
+}

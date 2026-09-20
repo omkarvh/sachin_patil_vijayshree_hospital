@@ -298,7 +298,12 @@ function buildVideoModal(){
 
   window.openVideoModal = function(video){
     if(video.type === 'youtube'){
-      inner.innerHTML = `<iframe src="https://www.youtube.com/embed/${video.src}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      /* Accept ANY YouTube link — watch?v=, youtu.be, /shorts/, /embed/ — or a
+         bare video ID, so whoever edits the site can just paste the address bar.
+         youtubeId() passes a bare ID straight through, so this is safe to apply
+         to values that are already ids. */
+      const id = youtubeId(video.src);
+      inner.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     } else {
       inner.innerHTML = `<video src="${video.src}" controls autoplay></video>`;
     }
@@ -400,8 +405,18 @@ function initFaqAccordion(){
 }
 
 /* ---------------- INIT ---------------- */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initPreloader();
+
+  /* Pull in whatever the admin panel has saved and fold it into CONTENT
+     before anything renders. The loading screen covers this.
+     Store.load() never throws — if it can't reach the database the site
+     just renders the defaults from content.js. */
+  if(typeof Store !== 'undefined'){
+    try { await Store.load(); }
+    catch(err){ console.warn('[site] falling back to default content:', err); }
+  }
+
   buildNavbar();
   buildFooter();
   buildFloatButtons();

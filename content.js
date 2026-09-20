@@ -329,6 +329,27 @@ const CONTENT = {
       { number: "API", label: "Executive Member, Bidar" }
     ],
 
+    /* ---------- CERTIFICATES & RECOGNITION ----------
+       Degrees, certifications and awards, shown as a gallery on the About
+       page. Clicking one opens it full size.
+
+       `image` is filled in from the ADMIN PANEL — upload the scan or photo
+       of the certificate there and it is stored automatically. An entry with
+       no image still shows as a neat card with its title and issuer, so the
+       list never looks broken while scans are still being collected. */
+    certificates: {
+      eyebrow: "Credentials",
+      title: "Certificates & Recognition",
+      subtitle: "Degrees, certifications and honours — tap any certificate to view it full size.",
+      items: [
+        { title: "MBBS", issuer: "Bachelor of Medicine, Bachelor of Surgery", year: "", image: "" },
+        { title: "MD — Internal Medicine", issuer: "Rajiv Gandhi University of Health Sciences, Karnataka", year: "", image: "" },
+        { title: "CPCDM", issuer: "Certificate Course in Diabetes Management", year: "", image: "" },
+        { title: "Executive Member, API", issuer: "Association of Physicians of India, Bidar Branch", year: "2025-26", image: "" },
+        { title: "Pride of Karnataka", issuer: "Karnataka Media Club", year: "2026", image: "" }
+      ]
+    },
+
     philosophy: {
       title: "Approach to Care",
       quote: "\"Good medicine is not about ordering every test — it's about listening carefully, explaining plainly, and treating what actually needs treating.\"",

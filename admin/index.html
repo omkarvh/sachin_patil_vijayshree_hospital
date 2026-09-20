@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Manager | Vijayshree Healthcare</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../assets/favicon/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div class="login-wrap" id="login">
+  <form class="login-card" id="loginForm">
+    <div class="login-logo"><img src="../assets/images/logo.png" alt="" onerror="this.style.display='none'"></div>
+    <h1>Site Manager</h1>
+    <p class="login-sub">Sign in to update the website.</p>
+
+    <label class="fld-label" for="email">Email</label>
+    <input class="inp" type="email" id="email" autocomplete="username" required>
+
+    <label class="fld-label" for="password">Password</label>
+    <input class="inp" type="password" id="password" autocomplete="current-password" required>
+
+    <div class="login-err" id="loginError" style="display:none"></div>
+    <button class="btn btn-primary btn-block" id="loginBtn" type="submit">Sign in</button>
+  </form>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="admin" id="app" style="display:none">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="../assets/favicon/icon-192.png" alt="" onerror="this.style.display='none'">
+      <div>
+        <div class="brand-name">Site Manager</div>
+        <div class="brand-sub">Vijayshree Healthcare</div>
+      </div>
+    </div>
+
+    <nav id="nav" class="nav"></nav>
+
+    <div class="sidebar-foot">
+      <a class="nav-item" href="../index.html" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span>View website</span>
+      </a>
+      <button class="nav-item" id="logoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="who" id="whoami"></span>
+        <span class="dirty-dot" id="dirtyDot" style="display:none" title="Unsaved changes"></span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost btn-sm" id="revertBtn">Discard changes</button>
+        <button class="btn btn-primary" id="saveBtn">Save &amp; publish</button>
+      </div>
+    </header>
+
+    <div class="mode-banner" id="modeBanner" style="display:none">
+      <strong>Preview mode</strong> — Firebase isn't connected yet, so changes save only
+      in this browser and only you can see them. Fill in <code>js/firebase-config.js</code>
+      to publish to the live site.
+    </div>
+
+    <div class="panel" id="panel"></div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK: loaded only here in the admin, never on the public site -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="../content.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/store.js"></script>
+<script src="../js/icons.js"></script>
+<script src="js/db.js"></script>
+<script src="js/image.js"></script>
+<script src="js/schema.js"></script>
+<script src="js/editors.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
