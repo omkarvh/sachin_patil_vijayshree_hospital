@@ -232,21 +232,25 @@ const App = (function(){
       location.reload();
     });
 
-    $('#loginForm').addEventListener('submit', async e => {
-      e.preventDefault();
+    $('#loginBtn').addEventListener('click', async () => {
       const err = $('#loginError');
       err.style.display = 'none';
       const btn = $('#loginBtn');
+      const original = btn.innerHTML;
       btn.disabled = true; btn.textContent = 'Signing in…';
       try {
-        await DB.signIn($('#email').value, $('#password').value);
+        await DB.signInWithGoogle();
+        // onAuth takes over from here and swaps in the app.
       } catch(ex){
         err.textContent = friendlyAuthError(ex);
         err.style.display = '';
+        btn.innerHTML = original;
       } finally {
-        btn.disabled = false; btn.textContent = 'Sign in';
+        btn.disabled = false;
       }
     });
+
+    if(ADMIN_EMAIL) $('#loginHint').textContent = 'Use ' + ADMIN_EMAIL;
 
     // Ctrl/Cmd+S saves
     document.addEventListener('keydown', e => {
@@ -261,11 +265,14 @@ const App = (function(){
 
   function friendlyAuthError(ex){
     const code = (ex && ex.code) || '';
-    if(code.includes('wrong-password') || code.includes('invalid-credential'))
-      return 'That email and password do not match.';
-    if(code.includes('user-not-found')) return 'No account found for that email.';
-    if(code.includes('too-many-requests')) return 'Too many attempts. Please wait a minute and try again.';
-    if(code.includes('network')) return 'No internet connection.';
+    if(code === 'admin/wrong-account')        return ex.message;
+    if(code.includes('popup-closed-by-user')) return 'Sign-in window was closed before finishing.';
+    if(code.includes('popup-blocked'))        return 'Your browser blocked the sign-in window. Allow pop-ups for this site and try again.';
+    if(code.includes('cancelled-popup'))      return 'Another sign-in window was already open.';
+    if(code.includes('unauthorized-domain'))  return 'This web address is not authorised in Firebase. Add it under Authentication → Settings → Authorized domains.';
+    if(code.includes('operation-not-allowed')) return 'Google sign-in is not switched on in Firebase (Authentication → Sign-in method).';
+    if(code.includes('too-many-requests'))    return 'Too many attempts. Please wait a minute and try again.';
+    if(code.includes('network'))              return 'No internet connection.';
     return (ex && ex.message) || 'Could not sign in.';
   }
 

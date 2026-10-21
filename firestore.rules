@@ -31,12 +31,18 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    /* Any signed-in account may edit. To restrict it to one person,
-       replace the line below with:
-         return request.auth != null
-                && request.auth.token.email == 'clinic@example.com';   */
+    /* Only the clinic's Google account may change anything.
+
+       This is the REAL security boundary — the check in the admin panel's
+       JavaScript is only there to show a friendly message, and anyone could
+       bypass that. This one is enforced by Google's servers.
+
+       To hand the site to a different account later, change the address here
+       and press Publish. */
     function isAdmin(){
-      return request.auth != null;
+      return request.auth != null
+             && request.auth.token.email_verified == true
+             && request.auth.token.email == 'vijayshreehealthcare@gmail.com';
     }
   }
 }

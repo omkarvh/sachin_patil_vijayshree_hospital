@@ -14,22 +14,30 @@ function renderPage(){
 
   // Background is either a real YouTube clip or a local mp4 — set by `type` in content.js
   let heroBg;
-  if(bg.type === 'youtube'){
-    const id = youtubeId(bg.youtubeId);
-    const params = `autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1` +
-                   `&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&start=${bg.startAt || 0}`;
+  const usingYouTube = bg.type === 'youtube';
+
+  if(usingYouTube){
+    /* The poster image is shown first and the video is faded in only once it is
+       genuinely PLAYING. Without that, YouTube briefly paints its own player
+       chrome (the big play button and control bar) while the embed boots —
+       `controls=0` does not suppress that opening flash. */
     const zoom = bg.zoom || 1;
     const offsetY = bg.offsetY || 0;
     heroBg = `
-      <div class="hero-yt-wrap" style="background-image:url('${bg.poster}')">
-        <iframe src="https://www.youtube.com/embed/${id}?${params}"
-                style="transform:translate(-50%,calc(-50% + ${offsetY}%)) scale(${zoom})"
-                title="Clinic background video" frameborder="0"
-                allow="autoplay; encrypted-media" tabindex="-1" aria-hidden="true"></iframe>
+      <div class="hero-yt-wrap" id="heroYtWrap" style="background-image:url('${bg.poster}')">
+        <div class="hero-yt-stage" style="transform:translate(-50%,calc(-50% + ${offsetY}%)) scale(${zoom})">
+          <div id="heroYtPlayer"></div>
+        </div>
+        <div class="hero-yt-shield"></div>
       </div>`;
   } else {
+    /* disablepictureinpicture + controlsList stop the browser offering its own
+       picture-in-picture and media buttons over what is only a backdrop. */
     heroBg = `
-      <video class="hero-video-bg" autoplay muted loop playsinline preload="auto" poster="${bg.poster}">
+      <video class="hero-video-bg" autoplay muted loop playsinline preload="auto"
+             disablepictureinpicture
+             controlslist="nodownload noplaybackrate nofullscreen noremoteplayback"
+             poster="${bg.poster}">
         <source src="${bg.src}" type="video/mp4">
       </video>`;
   }
@@ -67,6 +75,8 @@ function renderPage(){
   `;
   document.getElementById('heroPlayBtn').addEventListener('click', () => openVideoModal(H.hero.video));
 
+  if(usingYouTube) initHeroYouTube(youtubeId(bg.youtubeId), bg.startAt || 0);
+
   /* ----- STATS ----- */
   document.getElementById('statsRoot').innerHTML = `
     <div class="container"><div class="stats-grid">
@@ -77,6 +87,43 @@ function renderPage(){
         </div>`).join('')}
     </div></div>
   `;
+
+  /* ----- SHORT DOCTOR INTRO (links through to the full About page) ----- */
+  const DI = H.doctorIntro;
+  const diRoot = document.getElementById('doctorIntroRoot');
+  if(diRoot){
+    if(!DI || !(DI.paragraphs || []).length){
+      diRoot.style.display = 'none';           // nothing written yet — hide it
+    } else {
+      diRoot.innerHTML = `
+        <div class="container">
+          <div class="doc-intro">
+            <div class="doc-intro-media reveal-scale">
+              <img src="${DI.image || ''}" alt="${DI.title || S.doctorName}" loading="lazy"
+                   onerror="this.closest('.doc-intro-media').classList.add('no-img')">
+              <div class="doc-intro-badge">
+                <div class="name">${DI.title || S.doctorName}</div>
+                <div class="cred">${DI.subtitle || S.credentials}</div>
+              </div>
+            </div>
+            <div class="doc-intro-body reveal">
+              <span class="eyebrow-pill">${DI.eyebrow || 'Meet Your Doctor'}</span>
+              <h2>${DI.title || S.doctorName}</h2>
+              <p class="doc-intro-cred">${DI.subtitle || S.credentials}</p>
+              ${DI.paragraphs.map(t => `<p>${t}</p>`).join('')}
+              ${(DI.points || []).length ? `
+                <ul class="doc-intro-points">
+                  ${DI.points.map(pt => `<li>${icon('check-circle')}<span>${pt}</span></li>`).join('')}
+                </ul>` : ''}
+              <a href="about.html" class="btn btn-dark doc-intro-btn">
+                ${DI.btn || 'Read More'} ${icon('arrow-right')}
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
 
   /* ----- HIGHLIGHTS ----- */
   document.getElementById('highlightsRoot').innerHTML = `
@@ -247,4 +294,84 @@ function renderPage(){
       </div>
     </div>
   `;
+}
+
+/* ==========================================================
+   HERO YOUTUBE BACKGROUND
+   ----------------------------------------------------------
+   A raw YouTube embed flashes its own player UI — big play
+   button, control bar, title — for a moment while it starts,
+   and `controls=0` does not prevent that opening frame.
+
+   So the video is held invisible behind the poster image and
+   faded in only once the player reports it is actually PLAYING.
+   The clip is muted and looping: it is a backdrop, never a
+   player the visitor interacts with.
+   ========================================================== */
+function initHeroYouTube(videoId, startAt){
+  const wrap = document.getElementById('heroYtWrap');
+  if(!wrap || !videoId) return;
+
+  /* If the clip can't play — private, deleted, or embedding turned off by its
+     owner — YouTube renders its own "This video is unavailable" screen, complete
+     with player controls. That must never appear on the clinic's front page, so
+     a failed video stays hidden and the visitor simply keeps the poster image. */
+  let failed = false;
+
+  // Safety net for a slow (but working) start: reveal anyway rather than
+  // leaving the visitor on a still image forever.
+  const failSafe = setTimeout(() => { if(!failed) wrap.classList.add('ready'); }, 6000);
+
+  const reveal = () => {
+    if(failed) return;
+    clearTimeout(failSafe);
+    wrap.classList.add('ready');
+  };
+  const giveUp = (why) => {
+    failed = true;
+    clearTimeout(failSafe);
+    wrap.classList.remove('ready');
+    console.warn('[hero] background video unavailable — showing the poster image instead.', why);
+  };
+
+  function build(){
+    new YT.Player('heroYtPlayer', {
+      videoId,
+      playerVars: {
+        autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: videoId,
+        playsinline: 1, modestbranding: 1, rel: 0, iv_load_policy: 3,
+        disablekb: 1, fs: 0, start: startAt
+      },
+      events: {
+        onReady(e){
+          e.target.mute();          // required for autoplay to be allowed
+          e.target.playVideo();
+        },
+        onStateChange(e){
+          if(e.data === YT.PlayerState.PLAYING) reveal();
+          // A looping single video ends rather than loops on some browsers.
+          if(e.data === YT.PlayerState.ENDED) e.target.playVideo();
+        },
+        onError(e){ giveUp('YouTube error code ' + e.data); }
+      }
+    });
+  }
+
+  if(window.YT && window.YT.Player) return build();
+
+  // The API calls this global once it has loaded.
+  const prev = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function(){
+    if(typeof prev === 'function') prev();
+    build();
+  };
+
+  if(!document.getElementById('yt-iframe-api')){
+    const s = document.createElement('script');
+    s.id = 'yt-iframe-api';
+    s.src = 'https://www.youtube.com/iframe_api';
+    s.async = true;
+    s.onerror = () => giveUp('YouTube API script blocked');
+    document.head.appendChild(s);
+  }
 }

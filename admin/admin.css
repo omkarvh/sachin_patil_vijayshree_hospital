@@ -47,6 +47,14 @@ svg{ width:18px; height:18px; flex-shrink:0; }
 .btn-ghost{ background:transparent; color:var(--ink-2); }
 .btn-sm{ padding:7px 13px; font-size:13px; border-radius:9px; }
 .btn-block{ width:100%; }
+.btn-google{
+  background:#fff; border-color:#DADCE0; color:#3C4043; font-weight:600;
+  padding:12px 18px;
+}
+.btn-google:hover{ background:#F8F9FA; border-color:#C6C9CD; box-shadow:0 1px 3px rgba(60,64,67,.2); }
+.btn-google svg{ width:18px; height:18px; }
+.login-foot{ text-align:center; color:var(--ink-3); font-size:12.5px; margin:16px 0 0; }
+
 
 .inp{
   width:100%; padding:10px 13px; border:1px solid var(--line); border-radius:10px;

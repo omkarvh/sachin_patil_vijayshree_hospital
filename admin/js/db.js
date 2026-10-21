@@ -46,11 +46,30 @@ const DB = (function(){
     return fb.auth.onAuthStateChanged(u => cb(u));
   }
 
-  async function signIn(email, password){
-    if(IS_LOCAL_MODE) return { email, local:true };
-    if(ADMIN_EMAIL && email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase())
-      throw new Error('This account is not allowed to manage the site.');
-    const cred = await fb.auth.signInWithEmailAndPassword(email.trim(), password);
+  /* Google sign-in. The clinic's Gmail account IS the login, so there is no
+     separate website password to remember or lose.
+
+     The ADMIN_EMAIL check below is a courtesy — it gives a clear message to
+     someone signing in with the wrong Google account. It is NOT the security
+     boundary: anyone can edit client-side JavaScript. The real enforcement is
+     the matching email check in firestore.rules, which the server applies. */
+  async function signInWithGoogle(){
+    if(IS_LOCAL_MODE) return { email:'local@device', local:true };
+
+    const provider = new firebase.auth.GoogleAuthProvider();
+    if(ADMIN_EMAIL) provider.setCustomParameters({ login_hint: ADMIN_EMAIL });
+
+    const cred = await fb.auth.signInWithPopup(provider);
+    const email = (cred.user && cred.user.email) || '';
+
+    if(ADMIN_EMAIL && email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+      await fb.auth.signOut();
+      const err = new Error(
+        `Signed in as ${email}, which cannot manage this site. ` +
+        `Please use ${ADMIN_EMAIL}.`);
+      err.code = 'admin/wrong-account';
+      throw err;
+    }
     return cred.user;
   }
 
@@ -180,7 +199,7 @@ const DB = (function(){
   }
 
   return {
-    init, onAuth, signIn, signOut,
+    init, onAuth, signInWithGoogle, signOut,
     loadContent, saveContent,
     putMedia, getMedia, listMedia, deleteMedia, mediaUsage,
     MAX_DOC_BYTES

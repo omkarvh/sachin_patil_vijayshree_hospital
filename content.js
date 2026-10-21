@@ -176,6 +176,28 @@ const CONTENT = {
       { number: 9, suffix: " Hrs", label: "Daily OPD Availability" }
     ],
 
+    /* ---------- SHORT INTRODUCTION TO THE DOCTOR (Home page) ----------
+       A brief version of the About page, shown high up on the Home page so a
+       first-time visitor immediately knows who they would be seeing. The
+       "Read more" button takes them to the full About page. */
+    doctorIntro: {
+      eyebrow: "Meet Your Doctor",
+      title: "Dr. Sachin Patil",
+      subtitle: "MBBS, MD (Internal Medicine), CPCDM",
+      image: "assets/images/doctor-portrait.jpg",
+      paragraphs: [
+        "Dr. Sachin Patil is a Consultant Physician and Diabetologist in Bidar, and the founder of Vijayshree Healthcare. He trained in internal medicine, intensive care and emergency medicine, and holds the CPCDM certification in diabetes management.",
+        "He has authored 13 peer-reviewed papers, serves as an Executive Member of the Association of Physicians of India (Bidar Branch), and runs free health screening camps in villages across the district."
+      ],
+      points: [
+        "MD (Internal Medicine), RGUHS Karnataka",
+        "13 peer-reviewed publications",
+        "Executive Member, API Bidar",
+        "'Pride of Karnataka' awardee"
+      ],
+      btn: "Read More About Dr. Patil"
+    },
+
     highlights: {
       title: "Why Patients Choose Vijayshree Healthcare",
       subtitle: "Specialist-level internal medicine, available close to home",

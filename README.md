@@ -200,15 +200,17 @@ tested today. An amber banner at the top reminds you.
 
 1. Create a project at <https://console.firebase.google.com> (free Spark plan).
 2. **Build → Firestore Database → Create database** (production mode).
-3. **Build → Authentication → Sign-in method → Email/Password → Enable**, then
-   **Users → Add user** with the clinic's email and a password.
+3. **Build → Authentication → Sign-in method → Google → Enable.** No user needs
+   adding — signing in with the clinic's Google account creates it. The account
+   allowed to edit is set in two places and both must match:
+   `ADMIN_EMAIL` in `js/firebase-config.js`, and the email in `firestore.rules`.
 4. **Project settings → General → Your apps → Web app** — copy the config values
    into `js/firebase-config.js`.
 5. **Firestore → Rules** — paste in the contents of `firestore.rules` and Publish.
 
 That's it. The site switches over automatically: the banner disappears and the
-admin asks for a login. Set `ADMIN_EMAIL` in `js/firebase-config.js` to lock
-sign-in to one address.
+admin shows a **Sign in with Google** button. There is no separate website
+password — the clinic's Gmail account is the login.
 
 ## Why pictures are never uploaded to Firebase Storage
 

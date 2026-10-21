@@ -109,6 +109,18 @@ const SCHEMA = [
         { path:'hero.video.src',  label:'YouTube link or video file', type:'text',
           hint:'Paste the whole YouTube address (any format) — or a path like assets/video/intro.mp4' }
       ]},
+      { title:'Short doctor introduction',
+        note:'The brief "meet the doctor" block on the Home page. The button sends visitors to the full About page. Clear all the paragraphs to hide the whole section.',
+        fields:[
+        { path:'doctorIntro.eyebrow',  label:'Small label', type:'text' },
+        { path:'doctorIntro.title',    label:'Name', type:'text' },
+        { path:'doctorIntro.subtitle', label:'Qualifications line', type:'text' },
+        { path:'doctorIntro.image',    label:'Portrait photo', type:'image', kind:'portrait' },
+        { path:'doctorIntro.paragraphs', label:'Introduction paragraphs', type:'strings',
+          hint:'Keep it short — two paragraphs reads best. The full story lives on the About page.' },
+        { path:'doctorIntro.points',   label:'Highlights beside the photo', type:'strings' },
+        { path:'doctorIntro.btn',      label:'Button text', type:'text' }
+      ]},
       { title:'Scrolling strip', fields:[
         { path:'marquee', label:'Conditions treated', type:'strings' }
       ]},

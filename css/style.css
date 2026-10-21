@@ -335,19 +335,32 @@ body.light-nav .navbar.scrolled .nav-toggle{ color:var(--ink-900); }
 .hero-video-bg{
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0;
   filter:saturate(.85) contrast(1.05);
+  pointer-events:none;          /* no hover controls over a backdrop */
 }
+.hero-video-bg::-webkit-media-controls{ display:none !important; }
 /* YouTube used as the hero background — scaled to fill, clicks pass through */
 .hero-yt-wrap{
   position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;
   background-size:cover; background-position:center;
 }
-.hero-yt-wrap iframe{
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+/* The stage carries the zoom/offset; the player fills it. Kept invisible until
+   the clip is genuinely playing, so YouTube's opening player UI is never seen. */
+.hero-yt-stage{
+  position:absolute; top:50%; left:50%;
   width:100vw; height:56.25vw; min-height:100%; min-width:177.78vh;
-  border:0; pointer-events:none;
-  transform-origin:center center;
-  filter:saturate(.9) contrast(1.03);
+  transform-origin:center center; pointer-events:none;
 }
+.hero-yt-stage iframe,
+.hero-yt-stage > div{
+  width:100%; height:100%; border:0; pointer-events:none;
+  filter:saturate(.9) contrast(1.03);
+  opacity:0; transition:opacity .8s ease;
+}
+.hero-yt-wrap.ready .hero-yt-stage iframe{ opacity:1; }
+
+/* Swallows any stray pointer event so the backdrop can never be clicked,
+   paused or turned into a picture-in-picture window. */
+.hero-yt-shield{ position:absolute; inset:0; z-index:2; background:transparent; }
 
 .hero-overlay{
   position:absolute; inset:0; z-index:1;
@@ -1323,4 +1336,51 @@ body.light-nav .navbar.scrolled .nav-toggle{ color:var(--ink-900); }
   .cert-title{ font-size:14px; }
   .cert-issuer{ font-size:12px; }
   .cert-lb-close{ top:14px; right:14px; width:40px; height:40px; }
+}
+
+/* ==========================================================
+   DOCTOR INTRO — short "meet the doctor" block on the Home page
+   ========================================================== */
+.doc-intro{
+  display:grid; grid-template-columns:.85fr 1.15fr; gap:64px; align-items:center;
+}
+
+.doc-intro-media{
+  position:relative; border-radius:var(--radius-lg); overflow:hidden;
+  aspect-ratio:4/5; box-shadow:var(--shadow-lg); background:var(--paper-100);
+}
+.doc-intro-media::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(4,8,15,.78) 0%, transparent 48%);
+}
+.doc-intro-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* No portrait uploaded yet — keep a tidy branded panel instead of a broken image */
+.doc-intro-media.no-img{ background:var(--grad-night); }
+.doc-intro-media.no-img img{ display:none; }
+
+.doc-intro-badge{ position:absolute; bottom:24px; left:24px; right:24px; z-index:3; }
+.doc-intro-badge .name{
+  font-family:'Sora',sans-serif; font-weight:700; font-size:19px; color:#fff;
+}
+.doc-intro-badge .cred{ font-size:13px; color:var(--mint-300); font-weight:500; margin-top:2px; }
+
+.doc-intro-body h2{ margin-bottom:4px; }
+.doc-intro-cred{
+  color:var(--mint-600); font-weight:600; font-size:14.5px; margin-bottom:18px;
+}
+
+.doc-intro-points{
+  list-style:none; padding:0; margin:22px 0 30px;
+  display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px 24px;
+}
+.doc-intro-points li{ display:flex; align-items:flex-start; gap:10px; }
+.doc-intro-points svg{ width:19px; height:19px; color:var(--mint-500); flex-shrink:0; margin-top:1px; }
+.doc-intro-points span{ font-size:14px; color:var(--ink-600); line-height:1.45; }
+
+.doc-intro-btn{ margin-top:4px; }
+
+@media (max-width:900px){
+  .doc-intro{ grid-template-columns:1fr; gap:32px; }
+  .doc-intro-media{ max-width:340px; margin:0 auto; aspect-ratio:1/1; }
+  .doc-intro-points{ grid-template-columns:1fr; gap:10px; margin:18px 0 26px; }
 }
