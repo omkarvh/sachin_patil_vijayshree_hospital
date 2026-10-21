@@ -348,7 +348,14 @@ function initHeroYouTube(videoId, startAt){
           e.target.playVideo();
         },
         onStateChange(e){
-          if(e.data === YT.PlayerState.PLAYING) reveal();
+          if(e.data === YT.PlayerState.PLAYING){
+            /* Playback has begun, but YouTube paints its control overlay over
+               the opening seconds and only fades it once it decides the viewer
+               is idle. Waiting that out before fading in means the visitor
+               never sees a play button or scrub bar on the banner.
+               (A local video file avoids all of this — see the README.) */
+            setTimeout(reveal, 2600);
+          }
           // A looping single video ends rather than loops on some browsers.
           if(e.data === YT.PlayerState.ENDED) e.target.playVideo();
         },

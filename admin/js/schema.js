@@ -76,10 +76,10 @@ const SCHEMA = [
         { path:'hero.trustItems', label:'Trust points under the buttons', type:'strings' }
       ]},
       { title:'Banner background video',
-        note:'The silent video looping behind the headline. Paste a YouTube link, or point at a video file. Only the boxes that apply to your choice are shown.',
+        note:'The silent video looping behind the headline. A VIDEO FILE is recommended: YouTube shows its own play button and control bar over the opening seconds, which a file never does. Only the boxes that apply to your choice are shown.',
         fields:[
         { path:'hero.backgroundVideo.type', label:'Where the video comes from', type:'select',
-          options:[{v:'youtube',t:'A YouTube link'},{v:'mp4',t:'A video file'}] },
+          options:[{v:'mp4',t:'A video file (recommended)'},{v:'youtube',t:'A YouTube link'}] },
 
         { path:'hero.backgroundVideo.youtubeId', label:'YouTube link', type:'text',
           hint:'Paste the whole address — youtube.com/watch, youtu.be and /shorts links all work',
